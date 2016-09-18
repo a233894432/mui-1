@@ -1,9 +1,10 @@
-[![Join the chat at https://gitter.im/muicss/mui](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/muicss/mui?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# Material Design CSS Framework
 
 [![MUI](https://www.muicss.com/static/favicons/icon-192x192.png)](https://www.muicss.com)
 
-MUI is a lightweight HTML/CSS/JS framework that follows Google's Material Design guidelines.
+MUI is a lightweight CSS framework that follows Google's Material Design guidelines.
 
+[![Join the chat at https://gitter.im/muicss/mui](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/muicss/mui?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/muicss/mui.svg?branch=master)](https://travis-ci.org/muicss/mui)
 [![Dependency Status](https://david-dm.org/muicss/mui.svg)](https://david-dm.org/muicss/mui)
 [![devDependency Status](https://david-dm.org/muicss/mui/dev-status.svg)](https://david-dm.org/muicss/mui#info=devDependencies)
@@ -11,9 +12,24 @@ MUI is a lightweight HTML/CSS/JS framework that follows Google's Material Design
 **Use From the CDN:**
 
 ```html
-<link href="//cdn.muicss.com/mui-0.1.8/css/mui.min.css" rel="stylesheet" type="text/css" />
-<script src="//cdn.muicss.com/mui-0.1.8/js/mui.min.js"></script>
+<link href="//cdn.muicss.com/mui-0.8.0/css/mui.min.css" rel="stylesheet" type="text/css" />
+<script src="//cdn.muicss.com/mui-0.8.0/js/mui.min.js"></script>
 ```
+
+Or for development you can use the latest:
+
+```html
+<link href="//cdn.muicss.com/mui-latest/css/mui.min.css" rel="stylesheet" type="text/css" />
+<script src="//cdn.muicss.com/mui-latest/js/mui.min.js"></script>
+```
+
+**Install with NPM:**
+
+```shell
+$ npm install --save muicss
+```
+
+Read more: https://www.npmjs.com/package/muicss
 
 **Install with Bower:**
 
@@ -25,7 +41,7 @@ $ bower install mui
 
 MUI is designed from the ground up to be fast, small and developer friendly. By design it only includes the basic components you need to build a site that follows Google's Material Design guidelines. Some of the key features of MUI are:
 
-* Small footprint: mui.min.css - 5.6K, mui.min.js - 3.7K (gzipped)
+* Small footprint: mui.min.css - 6.6K, mui.min.js - 5.4K (gzipped)
 * A responsive grid to make mobile-friendly sites
 * No external dependencies
 * CSS library that can be customized with your own colors
@@ -67,7 +83,7 @@ MUI is tested and works in:
 1. Build examples
 
    ```bash
-   $ ./node_modules/.bin/gulp build-examples
+   $ ./node_modules/.bin/gulp examples:build
    ```
 
    To view the examples you can use any static file server. To use the nodejs `http-server` module:
@@ -79,20 +95,14 @@ MUI is tested and works in:
 
    Then visit http://localhost:3000/examples
 
-1. Watch changes and re-build
-
-   ```bash
-   $ ./node_modules/.bin/gulp watch
-   ```
-
 ## Run tests
 
 ### Unit tests
 
-To run the unit tests from the command line, run 'mocha':
+To run the unit tests from the command line, run 'npm test':
 
 ```bash
-$ ./node_modules/.bin/mocha
+$ npm test
 ```
 
 ### E2E tests
@@ -100,36 +110,64 @@ $ ./node_modules/.bin/mocha
 To run the E2E tests first compile the unit test files into a version that runs in the browser:
 
 ```bash
-$ ./node_modules/.bin/gulp build-e2e-tests
+$ ./node_modules/.bin/gulp e2e-tests:build
 ```
 
 Then visit http://localhost:3000/e2e-tests
 
-## Create a production build
+## Build Packages
 
-To create a production build of the app, run `gulp build-dist`:
+### CDN
 
 ```bash
-$ ./node_modules/.bin/gulp build-dist
+$ ./node_modules/.bin/gulp cdn:build
 ```
 
-The build will be located in the `dist` directory:
+The build will be located in the `packages/cdn` directory:
 
 <pre>
-dist/
+cdn/
+├── angular
+│   ├── mui-angular.js
+│   └── mui-angular.min.js
 ├── css
-│   ├── mui.css
-│   └── mui.min.css
+│   ├── mui.css
+│   ├── mui.min.css
+│   ├── mui-rtl.css
+│   └── mui-rtl.min.css
 ├── email
-│   ├── mui-email-inline.css
-|   └── mui-email-styletag.css
+│   ├── mui-email-inline.css
+│   ├── mui-email-inline-rtl.css
+│   ├── mui-email-styletag.css
+│   └── mui-email-styletag-rtl.css
+├── extra
+│   ├── mui-angular-combined.js
+│   ├── mui-colors.css
+│   ├── mui-combined.js
+│   └── mui-react-combined.js
 ├── js
-│   ├── mui.js
-│   └── mui.min.js
+│   ├── mui.js
+│   └── mui.min.js
 ├── react
-│   ├── mui-react.js
-│   └── mui-react.min.js
+│   ├── mui-react.js
+│   └── mui-react.min.js
 └── webcomponents
     ├── mui-webcomponents.js
     └── mui-webcomponents.min.js
 </pre>
+
+### NPM
+
+```bash
+$ ./node_modules/.bin/gulp npm:build
+```
+
+The NPM package is located in the `packages/npm` directory.
+
+### Meteor
+
+```bash
+$ ./node_modules/.bin/gulp meteor:build
+```
+
+The Meteor package is located in the `packages/meteor` directory.

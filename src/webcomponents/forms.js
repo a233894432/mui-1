@@ -6,26 +6,25 @@
 'use strict';
 
 
-var jqLite = require('../js/lib/jqLite.js'),
-    muiFormControl = require('../js/forms/form-control.js'),
-    formControlClass = 'mui-form-control',
-    formControlTagName = formControlClass,
-    formGroupClass = 'mui-form-group',
-    floatingLabelClass = 'mui-form-floating-label';
+var jqLite = require('../js/lib/jqLite'),
+    muiTextfield = require('../js/textfield'),
+    textfieldClass = 'mui-textfield',
+    floatingMod = '--float-label',
+    textfieldTagName = textfieldClass;
 
 
 /**
- * Class representing a FormControl element.
+ * Class representing a Textfield element.
  * @class
  */
-var FormControlProto = Object.create(HTMLElement.prototype);
+var TextfieldProto = Object.create(HTMLElement.prototype);
 
 
-/** FormControl createdCallback */
-FormControlProto.createdCallback = function() {
+/** Textfield createdCallback */
+TextfieldProto.createdCallback = function() {
   var root = this.createShadowRoot(),
       innerEl = document.createElement('div'),
-      labelEl;
+      cls;
 
   var attrs = {
     type: this.getAttribute('type') || 'text',
@@ -35,10 +34,13 @@ FormControlProto.createdCallback = function() {
     floating: this.getAttribute('floating')
   };
 
-  // create wrapper
-  innerEl.setAttribute('class', formGroupClass);
+  // set class
+  cls = textfieldClass;
+  if (attrs.floating !== null) cls += ' ' + textfieldClass + floatingMod;
 
-  // input element
+  innerEl.setAttribute('class', cls);
+
+  // add input element
   innerEl.appendChild(_createInputEl(attrs));
 
   // label element
@@ -53,14 +55,20 @@ FormControlProto.createdCallback = function() {
 }
 
 
-// ------------------------------
-// Utilities
-// ------------------------------
+
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
+
 var styleEl;
 
 
+/**
+ * Get or create style
+ * @function
+ */
 function _getStyleEl() {
-  // get or create cached element
   if (styleEl === undefined) {
     styleEl = document.createElement('style');
     styleEl.innerHTML = require('mui.min.css');
@@ -70,6 +78,10 @@ function _getStyleEl() {
 }
 
 
+/**
+ * Create input element.
+ * @function
+ */
 function _createInputEl(attrs) {
   var inputEl;
 
@@ -87,24 +99,21 @@ function _createInputEl(attrs) {
     inputEl.setAttribute('placeholder', attrs.placeholder);
   }
 
-  inputEl.setAttribute('class', formControlClass);
-
   // add event listeners
-  muiFormControl.initialize(inputEl);
+  muiTextfield.initialize(inputEl);
   
   return inputEl;
 }
 
 
+/**
+ * Create label element.
+ * @function
+ */
 function _createLabelEl(attrs) {
   var labelEl = document.createElement('label');
   labelEl.appendChild(document.createTextNode(attrs.label));
   
-  // configure floating label
-  if (attrs.floating !== null) {
-    labelEl.setAttribute('class', floatingLabelClass);
-  }
-
   return labelEl;
 }
 
@@ -113,12 +122,12 @@ function _createLabelEl(attrs) {
 module.exports = {
   /** Register module elements */
   registerElements: function() {
-    var FormControlElement = document.registerElement(formControlTagName, {
-      prototype: FormControlProto
+    var TextfieldElement = document.registerElement(textfieldTagName, {
+      prototype: TextfieldProto
     });
 
     return {
-      FormControlElement: FormControlElement
+      TextfieldElement: TextfieldElement
     };
   }
 };

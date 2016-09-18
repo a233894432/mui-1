@@ -7,157 +7,111 @@
 
 'use strict';
 
-var tabClass = 'mui-tabs',
-    contentClass = 'mui-tab-content',
-    paneClass = 'mui-tab-pane',
-    justifiedClass = 'mui-tabs-justified',
-    activeClass = 'mui-active';
+import React from 'react';
 
-var util = require('../js/lib/util.js');
+import Tab from './tab';
+import * as util from '../js/lib/util';
 
-var Tabs = React.createClass({
-  getDefaultProps: function() {
-    return {
-      justified: false
-    };
-  },
-  getInitialState: function() {
-    return {
-      activeTab: ""
-    };
-  },
-  componentDidMount: function() {
-    if (this.props.activeTab) {
-      this.setState({
-        activeTab: this.props.activeTab
-      });
-    } else {
-      this.setState({
-        activeTab: this.props.children && this.props.children[0].props.id
-      });
-    }
-  },
-  render: function() {
-    var items = this.props.children.map(function (item) {
-      return { name: item.props.id, label: item.props.label, pane: item.props.children }
-    });
-    return (
-      <div className="tabs">
-        <TabHeaders items={ items } justified={ this.props.justified } active={ this.state.activeTab } onClick={ this._changeTab }/>
-        <TabContainers items={ items } active={ this.state.activeTab } />
-      </div>
-    );
-  },
-  _changeTab: function (toWhich, e) {
-    // only left clicks
-    if (e.button !== 0) return;
 
-    if (e.target.getAttribute('disabled') !== null) return;
+const PropTypes = React.PropTypes,
+      tabsBarClass = 'mui-tabs__bar',
+      tabsBarJustifiedClass = 'mui-tabs__bar--justified',
+      tabsPaneClass = 'mui-tabs__pane',
+      isActiveClass = 'mui--is-active';
 
-    setTimeout(function () {
-      if (!e.defaultPrevented) {
-        this.setState({
-          activeTab: toWhich
-        });
+
+/**
+ * Tabs constructor
+ * @class
+ */
+class Tabs extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {currentSelectedIndex: props.initialSelectedIndex};
+  }
+
+  static propTypes = {
+    initialSelectedIndex: PropTypes.number,
+    justified: PropTypes.bool,
+    onChange: PropTypes.func
+  };
+
+  static defaultProps = {
+    className: '',
+    initialSelectedIndex: 0,
+    justified: false,
+    onChange: null
+  };
+
+  onClick(i, tab, ev) {
+    if (i !== this.state.currentSelectedIndex) {
+      this.setState({currentSelectedIndex: i});
+
+      // onActive callback
+      if (tab.props.onActive) tab.props.onActive(tab);
+
+      // onChange callback
+      if (this.props.onChange) {
+        this.props.onChange(i, tab.props.value, tab, ev);
       }
-    }.bind(this), 0);
-  }
-});
-
-var TabHeaders = React.createClass({
-  getDefaultProps: function() {
-    return {
-      items: []
-    };
-  },
-  render: function() {
-    var classes = {};
-    classes[tabClass] = true;
-    classes[justifiedClass] = this.props.justified;
-    classes = util.classNames(classes);
-
-    var items = this.props.items.map(function (item) {
-      return (
-        <TabHeaderItem key={ item.name }
-          name={ item.name }
-          label={ item.label }
-          active={ item.name === this.props.active }
-          onClick={ this.props.onClick } />
-      );
-    }.bind(this));
-    return (
-      <ul className={ classes }>
-        { items }
-      </ul>
-    );
-  }
-});
-
-var TabHeaderItem = React.createClass({
-  render: function () {
-    var classes = {};
-    classes[activeClass] = this.props.active;
-    classes = util.classNames(classes);
-    return (
-      <li className={ classes }>
-        <a onClick={ this._click }>
-          { this.props.label }
-        </a>
-      </li>
-    );
-  },
-  _click: function (e) {
-    if (this.props.onClick) {
-      this.props.onClick(this.props.name, e);
     }
   }
-});
 
-var TabContainers = React.createClass({
-  getDefaultProps: function() {
-    return {
-      items: []
-    };
-  },
-  render: function() {
-    var items = this.props.items.map(function (item) {
-      return (
-        <TabPane key={ item.name }
-          active={ item.name === this.props.active }>
-          { item.pane }
-        </TabPane>
+  render() {
+    const { children, initialSelectedIndex, justified,
+      ...reactProps } = this.props;
+    
+    let tabEls = [],
+        paneEls = [],
+        m = children.length,
+        selectedIndex = this.state.currentSelectedIndex % m,
+        isActive,
+        item,
+        cls,
+        i;
+
+    for (i=0; i < m; i++) {
+      item = children[i];
+
+      // only accept MUITab elements
+      if (item.type !== Tab) util.raiseError('Expecting MUITab React Element');
+
+      isActive = (i === selectedIndex) ? true : false;
+
+      // tab element
+      tabEls.push(
+        <li key={i} className={(isActive) ? isActiveClass : ''}>
+          <a onClick={this.onClick.bind(this, i, item)}>
+            {item.props.label}
+          </a>
+        </li>
       );
-    }.bind(this));
+
+      // pane element
+      cls = tabsPaneClass + ' ';
+      if (isActive) cls += isActiveClass;
+
+      paneEls.push(
+        <div key={i} className={cls}>
+          {item.props.children}
+        </div>
+      );
+    }
+
+    cls = tabsBarClass;
+    if (justified) cls += ' ' + tabsBarJustifiedClass;
+
     return (
-      <div className={ contentClass }>
-        { items }
+      <div { ...reactProps }>
+        <ul className={cls}>
+          {tabEls}
+        </ul>
+        {paneEls}
       </div>
     );
   }
-});
+}
 
-var TabPane = React.createClass({
-  render: function () {
-    var classes = {};
-    classes[paneClass] = true;
-    classes[activeClass] = this.props.active;
-    classes = util.classNames(classes);
-    return (
-      <div className={ classes }>
-        { this.props.children }
-      </div>
-    );
-  }
-});
 
-// Just a container to hold data
-var TabItem = React.createClass({
-  render: function() {
-    return null;
-  }
-});
-
-module.exports = {
-  Tabs: Tabs,
-  TabItem: TabItem
-};
+/** Define module API */
+export default Tabs;
